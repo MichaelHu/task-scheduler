@@ -1,0 +1,116 @@
+<!Doctype html>
+<html>
+    <head>
+        <title>Test Task-Scheduler</title>
+        <script src="http://258i.com/static/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="../dist/bundle.js"></script>
+    </head>
+    <body>
+    </body>
+</html>
+<script>
+var taskConfigs = [
+        {
+            id: 'task-1'
+            , options: {
+                request: {
+                    type: 'GET'
+                    , url: 'http://258i.com/phpapp/cors-new.php'
+                }
+                , callback: {
+                    success: ( resp ) => {
+                        console.log( 'task-1 request success', resp );
+                        return resp;
+                    }
+                }
+            }
+        }
+
+        , {
+            id: 'task-2'
+            , options: {
+                input: {
+                    name: {
+                        id: 'task-1'
+                        , ondone: ( outputInfo ) => {
+                            console.log(
+                                'task-2 inputInfo.name becomes valid after task-1 is done'
+                                , outputInfo.name
+                            );
+                            return outputInfo.name;
+                        }
+                        , __type: 'DEP'
+                    }
+                    // 两个不同字段依赖同一个task
+                    , name_2nd: {
+                        id: 'task-1'
+                        , ondone: ( outputInfo ) => {
+                            console.log(
+                                'task-2 inputInfo.name_2nd becomes valid after task-1 is done'
+                                , outputInfo.name
+                            );
+                            return outputInfo.name;
+                        }
+                        , __type: 'DEP'
+                    }
+                    , msg: ( fields ) => { return 'Hello, ' + fields.name; }
+                } 
+                , request: {
+                    type: 'GET'
+                    , url: 'http://258i.com/phpapp/cors-new.php'
+                }
+                , callback: {
+                    success: ( resp ) => {
+                        console.log( 'task-2 request success', resp );
+                        return resp;
+                    }
+                }
+            }
+        }
+
+        , {
+            id: 'task-3'
+            , options: {
+                input: {
+                    name: {
+                        id: 'task-1'
+                        , ondone: ( outputInfo ) => {
+                            console.log(
+                                'task-3 inputInfo.name becomes valid after task-1 is done'
+                                , outputInfo.name
+                            );
+                            return outputInfo.name;
+                        }
+                        , __type: 'DEP'
+                    }
+                    , name_2nd: {
+                        id: 'task-2'
+                        , ondone: ( outputInfo ) => {
+                            console.log(
+                                'task-3 inputInfo.name becomes valid after task-2 is done'
+                                , outputInfo.name
+                            );
+                            return 'task-2-output';
+                        }
+                        , __type: 'DEP'
+                    }
+                }
+                , request: {
+                    type: 'POST'
+                    , url: 'http://258i.com/phpapp/form-enctype.php'
+                    , data: inputInfo => inputInfo
+                }
+            }
+        }
+
+    ];
+
+let prefix = 'p' + Date.now() + '-';
+let onstatechange = ( params, target ) => {
+        console.log( '\n statechange', target.id, target.state );
+        console.log( tm.toGraph() );
+    };
+
+let tm = new TaskManager( { prefix, taskConfigs, onstatechange } ); 
+tm.addDeps().start();
+</script>
