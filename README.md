@@ -1,4 +1,4 @@
-# task-scheduler
+# async-task-scheduler
 
 a js task scheduler for async requests
 

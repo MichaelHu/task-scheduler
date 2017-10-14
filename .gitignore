@@ -3,4 +3,5 @@
 *.swo
 *.swp
 *.o
+*.log
 node_modules
