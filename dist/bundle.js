@@ -525,8 +525,8 @@ var Task = function (_EventTarget) {
             var settings = _utils2.default.extend({}, requestInfo, callback);
             var oldSuccess = settings.success;
             var oldError = settings.error;
-            settings.success = function (resp) {
-                me.outputInfo = oldSuccess(resp);
+            settings.success = function (resp, textStatus, request) {
+                me.outputInfo = oldSuccess(resp, textStatus, request);
                 me.state = 'DONE';
                 me.dispatch('statechange');
                 me.dispatch('done', me.outputInfo);
