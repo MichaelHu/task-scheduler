@@ -23,8 +23,9 @@ class Task extends EventTarget {
      * Create a Task
      * @param {string} id                           - task id
      * @param {Object} [options]                    - task options
-     * @param {Object} options.request              - task request config 
+     * @param {string|Object} options.desc          - task description
      * @param {string|number} [options.prefix='']   - task id prefix，一般由TaskManager统一设置
+     * @param {Object} options.request              - task request config 
      * @param {Object} [options.input]              - task input config
      * @param {Object} [options.callback]           - task request callback
      */
@@ -57,6 +58,7 @@ class Task extends EventTarget {
         me.isTesting = opt.isTesting || false;
         me.prefix = prefix;
         me.id = id;
+        me.desc = opt.desc || '';
         me.input = input;
         me.request = request;
         me.inputInfo = {};
@@ -195,13 +197,13 @@ class Task extends EventTarget {
         let oldSuccess = settings.success;
         let oldError = settings.error;
         settings.success = ( resp, textStatus, request ) => {
-            me.outputInfo = oldSuccess( resp, textStatus, request );
+            me.outputInfo = oldSuccess.bind( me )( resp, textStatus, request );
             me.state = 'DONE';
             me.dispatch( 'statechange' );
             me.dispatch( 'done', me.outputInfo );
         };
         settings.error = ( xhr, textStatus, errorThrown ) => {
-            oldError( xhr, textStatus, errorThrown );
+            oldError.bind( me )( xhr, textStatus, errorThrown );
             throw errorThrown;
         };
         $.ajax( settings.url, settings );

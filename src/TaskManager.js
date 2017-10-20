@@ -85,7 +85,7 @@ class TaskManager {
             let node = utils.extendOnly( 
                     { x: null, y: null, size: 5 }
                     , task
-                    , [ 'id', 'inputInfo', 'requestInfo' ]
+                    , [ 'id', 'desc', 'state', 'inputInfo', 'requestInfo' ]
                 );
             nodes.push( node );
 
